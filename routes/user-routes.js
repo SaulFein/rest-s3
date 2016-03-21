@@ -55,7 +55,8 @@ module.exports = (router, models) => {
     })
     .post((req, res) => {
       User.findbyId(req.params.id, req.body, {new: true}, (err, user) => {
-
+        if (err) return res.send(err);
+        res.json({message: 'Filed added to user'});
       })
     });
 }
