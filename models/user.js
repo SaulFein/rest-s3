@@ -1,9 +1,14 @@
 'use strict';
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
+module.exports = function (mongoose, models) {
 
-var userSchema = mongoose.Schema({
+}
+
+
+let userSchema = new mongoose.Schema({
   username: String,
-  files: Array
+  files: [{type: mongoose.Schema.Types.ObjectId, ref: 'File'}]
 });
 
-module.exports = mongoose.model('User', userSchema);
+let User = mongoose.model('User', userSchema);
+module.exports = User;
