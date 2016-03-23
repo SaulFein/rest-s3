@@ -28,7 +28,7 @@ module.exports = (router, models) => {
         res.json({msg:'New user "' + req.body.username + '" has been created'});
       });
     });
-//'{"name":"Kimi Raikkonen", "raceWins":20}'
+//'{"username":"Kimi Raikkonen", "files":[]}'
   router.route('/users/:id')
     .get((req, res) => {
       User.findById(req.params.id, (err, user) => {
@@ -50,13 +50,37 @@ module.exports = (router, models) => {
     });
 
   router.route('/users/:id/files')
-    .get((req, res) => {
-      // User.
-    })
-    .post((req, res) => {
-      User.findbyId(req.params.id, req.body, {new: true}, (err, user) => {
-        if (err) return res.send(err);
-        res.json({message: 'Filed added to user'});
-      })
+  .get((req, res) => {
+    User.findById(req.params.id, (err, user) => {
+      if (err) return res.send(err);
+      res.status(200).json(user.files);
     });
+  })
+  .post((req, res) => {
+    let fileJSON = {
+      Key: req.params.id + '/' + req.body.name,
+      Body: req.body.content
+    };
+    s3Services.upload(fileJSON, (err, data) => {
+      if (err) return res.send(err);
+
+      var s3File = {
+        name: data.key,
+        url: data.Location,
+        content: req.body.content
+      };
+
+      var newFile = new File(s3File);
+      newFile.save((err, file) => {
+        if (err) return res.send(err);
+        User.findById(req.params.user)
+          .populate('files')
+          .exec((err, user) => {
+            user.files.push(file._id);
+            if (err) return res.send(err);
+            res.status(200).json(user);
+          });
+      });
+    });
+  });
 }

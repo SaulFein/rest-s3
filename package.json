@@ -14,6 +14,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "chai-http": "^2.0.1",
     "eslint": "^2.4.0",
     "gulp": "^3.9.1",
     "gulp-eslint": "^2.0.0",
